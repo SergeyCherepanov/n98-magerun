@@ -405,6 +405,7 @@ HELP;
     protected function installSampleData(InputInterface $input, OutputInterface $output)
     {
         if (empty($this->config['magentoPackage'])) {
+            $this->selectMagentoVersion($input, $output);
             $package = $this->createComposerPackageByConfig($this->config['magentoVersionData']);
             $this->config['magentoPackage'] = $package;
             $composer = $this->getComposer($input, $output);
