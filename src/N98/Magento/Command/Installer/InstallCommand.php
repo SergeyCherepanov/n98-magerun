@@ -139,9 +139,9 @@ HELP;
 
         $this->createDatabase($input, $output);
 
-        if (!$input->getOption('noDownload')) {
-            $this->installSampleData($input, $output);
-        }
+        #if (!$input->getOption('noDownload')) {
+        $this->installSampleData($input, $output);
+        #}
 
         $this->removeEmptyFolders();
         $this->setDirectoryPermissions($output);
