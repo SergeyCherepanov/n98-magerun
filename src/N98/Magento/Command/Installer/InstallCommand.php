@@ -404,6 +404,21 @@ HELP;
      */
     protected function installSampleData(InputInterface $input, OutputInterface $output)
     {
+        if (empty($this->config['magentoPackage'])) {
+            $package = $this->createComposerPackageByConfig($this->config['magentoVersionData']);
+            $this->config['magentoPackage'] = $package;
+            $composer = $this->getComposer($input, $output);
+            $targetFolder = $this->getTargetFolderByType($composer, $package, sys_get_temp_dir());
+            $this->config['magentoPackage'] = $this->downloadByComposerConfig(
+                $input,
+                $output,
+                $package,
+                $targetFolder,
+                true
+            );
+        }
+
+
         $magentoPackage = $this->config['magentoPackage']; /* @var $magentoPackage \Composer\Package\MemoryPackage */
         $extra  = $magentoPackage->getExtra();
         if (!isset($extra['sample-data'])) {
