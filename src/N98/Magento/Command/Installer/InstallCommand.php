@@ -467,27 +467,31 @@ HELP;
                     $sampleDataSqlFile = glob($this->config['installationFolder'] . '/_temp_demo_data/magento_*sample_data*sql');
                     $db = $this->config['db']; /* @var $db \PDO */
                     $db->query('SHOW TABLES;')->fetch();
-                    $tablesCount = $db->query('SELECT FOUND_ROWS() as count;', PDO::FETCH_ASSOC)->fetch();
-                    if (0 == $tablesCount['count'] && isset($sampleDataSqlFile[0])) {
-                        if (OperatingSystem::isProgramInstalled('mysql')) {
-                            $exec = 'mysql '
-                                . '-h' . escapeshellarg(strval($this->config['db_host']))
-                                . ' '
-                                . '-u' . escapeshellarg(strval($this->config['db_user']))
-                                . ' '
-                                . ($this->config['db_port'] != '3306' ? '-P' . escapeshellarg($this->config['db_port']) . ' ' : '')
-                                . (!strval($this->config['db_pass'] == '') ? '-p' . escapeshellarg($this->config['db_pass']) . ' ' : '')
-                                . strval($this->config['db_name'])
-                                . ' < '
-                                . escapeshellarg($sampleDataSqlFile[0]);
-                            $output->writeln('<info>Importing <comment>' . $sampleDataSqlFile[0] . '</comment> with mysql cli client</info>');
-                            Exec::run($exec);
-                            @unlink($sampleDataSqlFile[0]);
-                        } else {
-                            $output->writeln('<info>Importing <comment>' . $sampleDataSqlFile[0] . '</comment> with PDO driver</info>');
-                            // Fallback -> Try to install dump file by PDO driver
-                            $dbUtils = new DatabaseUtils();
-                            $dbUtils->importSqlDump($db, $sampleDataSqlFile[0]);
+                    $tablesCount = $db->query('SELECT FOUND_ROWS() as count;', \PDO::FETCH_ASSOC)->fetch();
+                    if ($tablesCount['count'] > 0) {
+                        $output->writeln('<info>Database not empty, skipping of import sample sql</info>');
+                    } else {
+                        if (isset($sampleDataSqlFile[0])) {
+                            if (OperatingSystem::isProgramInstalled('mysql')) {
+                                $exec = 'mysql '
+                                    . '-h' . escapeshellarg(strval($this->config['db_host']))
+                                    . ' '
+                                    . '-u' . escapeshellarg(strval($this->config['db_user']))
+                                    . ' '
+                                    . ($this->config['db_port'] != '3306' ? '-P' . escapeshellarg($this->config['db_port']) . ' ' : '')
+                                    . (!strval($this->config['db_pass'] == '') ? '-p' . escapeshellarg($this->config['db_pass']) . ' ' : '')
+                                    . strval($this->config['db_name'])
+                                    . ' < '
+                                    . escapeshellarg($sampleDataSqlFile[0]);
+                                $output->writeln('<info>Importing <comment>' . $sampleDataSqlFile[0] . '</comment> with mysql cli client</info>');
+                                Exec::run($exec);
+                                @unlink($sampleDataSqlFile[0]);
+                            } else {
+                                $output->writeln('<info>Importing <comment>' . $sampleDataSqlFile[0] . '</comment> with PDO driver</info>');
+                                // Fallback -> Try to install dump file by PDO driver
+                                $dbUtils = new DatabaseUtils();
+                                $dbUtils->importSqlDump($db, $sampleDataSqlFile[0]);
+                            }
                         }
                     }
                 }
