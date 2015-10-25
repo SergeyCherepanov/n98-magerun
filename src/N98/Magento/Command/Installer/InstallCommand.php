@@ -139,9 +139,9 @@ HELP;
 
         $this->createDatabase($input, $output);
 
-        #if (!$input->getOption('noDownload')) {
-        $this->installSampleData($input, $output);
-        #}
+        if ($input->getOption('installSampleData')) {
+            $this->installSampleData($input, $output);
+        }
 
         $this->removeEmptyFolders();
         $this->setDirectoryPermissions($output);
@@ -461,8 +461,6 @@ HELP;
                         $filesystem->recursiveRemoveDirectory($this->config['installationFolder'] . '/vendor/composer');
                     }
 
-
-
                     // Install sample data
                     $sampleDataSqlFile = glob($this->config['installationFolder'] . '/_temp_demo_data/magento_*sample_data*sql');
                     $db = $this->config['db']; /* @var $db \PDO */
@@ -548,7 +546,7 @@ HELP;
         $defaults = $this->commandConfig['installation']['defaults'];
 
         $useDefaultConfigParams = $this->_parseBoolOption($input->getOption('useDefaultConfigParams'));
-        
+
         $sessionSave = $useDefaultConfigParams ? $defaults['session_save'] : $dialog->ask(
             $output,
             '<question>Please enter the session save:</question> <comment>[' . $defaults['session_save'] . ']</comment>: ',
