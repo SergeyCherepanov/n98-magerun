@@ -461,10 +461,14 @@ HELP;
                         $filesystem->recursiveRemoveDirectory($this->config['installationFolder'] . '/vendor/composer');
                     }
 
+
+
                     // Install sample data
                     $sampleDataSqlFile = glob($this->config['installationFolder'] . '/_temp_demo_data/magento_*sample_data*sql');
                     $db = $this->config['db']; /* @var $db \PDO */
-                    if (isset($sampleDataSqlFile[0])) {
+                    $db->query('SHOW TABLES;')->fetch();
+                    $tablesCount = $db->query('SELECT FOUND_ROWS() as count;', PDO::FETCH_ASSOC)->fetch();
+                    if (0 == $tablesCount['count'] && isset($sampleDataSqlFile[0])) {
                         if (OperatingSystem::isProgramInstalled('mysql')) {
                             $exec = 'mysql '
                                 . '-h' . escapeshellarg(strval($this->config['db_host']))
